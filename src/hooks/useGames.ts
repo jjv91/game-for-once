@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import axios, { CancelTokenSource } from "axios";
 import apiClient from "../services/api-client";
-import {CanceledError} from "axios";
 
-export interface Platform{
-  id:number;
-  name:string;
-  slug:string;
+export interface Platform {
+  id: number;
+  name: string;
+  slug: string;
 }
 
 type NewType = Platform;
@@ -13,8 +13,8 @@ type NewType = Platform;
 export interface Game {
   id: number;
   name: string;
-  background_image:string;
-  parent_platforms: {platform:Platform}[];
+  background_image: string;
+  parent_platforms: { platform: Platform }[];
   metacritic: number;
 }
 
@@ -25,16 +25,31 @@ interface FetchGamesResponse {
 
 const useGames = () => {
   const [games, setGames] = useState<Game[]>([]);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
+    let cancelTokenSource: CancelTokenSource = axios.CancelToken.source();
+    setLoading(true);
     apiClient
-      .get<FetchGamesResponse>("/games")
-      .then((res) => setGames(res.data.results))
-      .catch((err) => setError(err.message));
+      .get<FetchGamesResponse>("/games", { cancelToken: cancelTokenSource.token })
+      .then((res) => {
+        setGames(res.data.results);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (axios.isCancel(err)) return;
+        setError(err.message);
+        setLoading(false);
+      });
+
+    // Clean up function
+    return () => {
+      cancelTokenSource.cancel();
+    };
   }, []);
 
-  return { games, error };
+  return { games, error, isLoading };
 };
 
 export default useGames;
