@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import axios, { CancelTokenSource } from "axios";
-import apiClient from "../services/api-client";
+import apiClient from "../services/api-client"
 
 export interface Platform {
   id: number;
   name: string;
   slug: string;
 }
+
 
 type NewType = Platform;
 
