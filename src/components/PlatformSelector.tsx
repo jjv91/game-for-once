@@ -8,20 +8,22 @@ interface Props {
   onSelectPlatform: (platform: Platform) => void;
   selectedPlatform: Platform | null;
 }
+
 const PlatformSelector = ({ onSelectPlatform, selectedPlatform }: Props) => {
-  const { data, error } = usePlatforms();
+  const { data: platforms, error } = usePlatforms();
 
   if (error) return null;
+
   return (
     <Menu>
       <MenuButton as={Button} rightIcon={<BsChevronDown />}>
-        {selectedPlatform?.name || "Platforms"}
+        {selectedPlatform?.name || "Select platform"}
       </MenuButton>
       <MenuList>
-        {data.map((platform) => (
+        {platforms.map((platform) => (
           <MenuItem
-            onClick={() => onSelectPlatform(platform)}
             key={platform.id}
+            onClick={() => onSelectPlatform(platform)}
           >
             {platform.name}
           </MenuItem>
