@@ -3,7 +3,6 @@ import {
   List,
   ListItem,
   Image,
-  Text,
   Spinner,
   Button,
   Heading,
@@ -17,16 +16,19 @@ interface Props {
 }
 
 const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
-  const { data, isLoading } = useGenres();
+  const { data, isLoading, error } = useGenres();
+
+  if (error) return <div>Error!</div>;
 
   if (isLoading) return <Spinner />;
+
   return (
     <>
       <Heading fontSize="2xl" marginBottom={3}>
         Genres
       </Heading>
       <List>
-        {data.map((genre) => (
+        {data.map((genre: Genre) => (
           <ListItem key={genre.id} paddingY="5px">
             <HStack>
               <Image
